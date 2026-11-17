@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Orbit Rush</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="hudCoins">0</div>
+  <div id="hudScore">0</div>
+  <div id="hudCombo"></div>
+</div>
+
+<section id="menu" class="screen show">
+  <h1 class="logo">ORBIT<span>RUSH</span></h1>
+  <div class="stats">
+    <div><b id="menuBest">0</b>Best score</div>
+    <div><b id="menuCoins">0</b>Coins</div>
+  </div>
+  <button class="btn primary" id="btnPlay">Play</button>
+  <div class="row">
+    <button class="btn" id="btnShop">Skins</button>
+    <button class="btn" id="btnSound">Sound: On</button>
+  </div>
+  <p class="hint">Tap, click or press Space to switch orbits.<br>Dodge the red barriers. Grab stars and coins.</p>
+</section>
+
+<section id="shop" class="screen">
+  <h2>Skins</h2>
+  <div class="stats"><div><b id="shopCoins">0</b>Coins</div></div>
+  <div id="skinGrid"></div>
+  <button class="btn" id="btnShopBack">Back</button>
+</section>
+
+<section id="over" class="screen">
+  <h2>Crashed</h2>
+  <div id="newBest">New best!</div>
+  <div class="bigScore" id="overScore">0</div>
+  <div class="stats">
+    <div><b id="overBest">0</b>Best</div>
+    <div><b id="overCoins">0</b>Coins this run</div>
+  </div>
+  <button class="btn primary" id="btnAgain">Play again</button>
+  <button class="btn" id="btnMenu">Main menu</button>
+</section>
+
+<section id="pause" class="screen">
+  <h2>Paused</h2>
+  <button class="btn primary" id="btnResume">Resume</button>
+</section>
+
+<script>
+(() => {
+  const hosts = [location.hostname];
+  try { if (document.referrer) hosts.push(new URL(document.referrer).hostname); } catch (e) {}
+  const isPoki = hosts.some(host => host === 'poki.com' || host.endsWith('.poki.com'));
+  const isCrazyGames = hosts.some(host => host === 'crazygames.com' || host.endsWith('.crazygames.com'));
+  const src = isPoki ? 'https://game-cdn.poki.com/scripts/v2/poki-sdk.js' :
+    isCrazyGames ? 'https://sdk.crazygames.com/crazygames-sdk-v3.js' : '';
+  window.__platformSdkReady = new Promise(resolve => {
+    if (!src) return resolve();
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = resolve;
+    document.head.appendChild(script);
+  });
+})();
+</script>
+<script src="game.js"></script>
+</body>
+</html>
