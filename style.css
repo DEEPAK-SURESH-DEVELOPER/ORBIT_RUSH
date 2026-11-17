@@ -62,3 +62,6 @@ h2{margin:0;font-size:clamp(30px,7vmin,48px);letter-spacing:.08em;text-shadow:0 
 }
 
 @media (prefers-reduced-motion:reduce){.screen,.btn{transition:none}#newBest.on{animation:none}}
+
+#loading{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:24px;background:#04050f;color:#e8f4ff;font-weight:700;font-size:18px;letter-spacing:.04em}
+body:not(.loading) #loading{display:none}

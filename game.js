@@ -16,10 +16,15 @@ const skinById = id => SKINS.find(s => s.id === id) || SKINS[0];
 const Save = {
   key: 'orbitrush.save', version: 1, data: null,
   defaults: () => ({v:1, best:0, coins:0, unlocked:['blue'], skin:'blue', sound:true, games:0, stars:0}),
+  storage() {
+    const data = window.CrazyGames?.SDK?.data;
+    if (data && typeof data.getItem === 'function' && typeof data.setItem === 'function') return data;
+    return localStorage;
+  },
   load() {
     const d = this.defaults();
     try {
-      const r = JSON.parse(localStorage.getItem(this.key));
+      const r = JSON.parse(this.storage().getItem(this.key));
       if (r && typeof r === 'object') {
         for (const k of ['best','coins','games','stars'])
           if (Number.isFinite(r[k]) && r[k] >= 0) d[k] = Math.floor(r[k]);
@@ -32,10 +37,8 @@ const Save = {
     this.data = d;
     return d;
   },
-  save() { try { localStorage.setItem(this.key, JSON.stringify(this.data)); } catch (e) {} }
+  save() { try { this.storage().setItem(this.key, JSON.stringify(this.data)); } catch (e) {} }
 };
-Save.load();
-
 /* ============ AUDIO MANAGER ============ */
 const Sfx = {
   ctx: null,
@@ -386,6 +389,15 @@ function frame(t) {
   last = t;
   update(dt); render();
 }
-UI.refresh(); UI.show('menu');
-requestAnimationFrame(frame);
+platformReady.then(() => {
+  Save.load();
+  UI.refresh(); UI.show('menu');
+  document.body.classList.remove('loading');
+  requestAnimationFrame(frame);
+}, () => {
+  Save.load();
+  UI.refresh(); UI.show('menu');
+  document.body.classList.remove('loading');
+  requestAnimationFrame(frame);
+});
 })();
