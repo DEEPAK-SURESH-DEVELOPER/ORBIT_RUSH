@@ -24,7 +24,22 @@ const Save = {
   load() {
     const d = this.defaults();
     try {
-      const r = JSON.parse(this.storage().getItem(this.key));
+      const sdkData = window.CrazyGames?.SDK?.data;
+      let saved = null;
+      if (sdkData && typeof sdkData.getItem === 'function' && typeof sdkData.setItem === 'function') {
+        saved = sdkData.getItem(this.key);
+        if (saved === null) {
+          let legacy = null;
+          try { legacy = localStorage.getItem(this.key); } catch (e) {}
+          if (legacy !== null) {
+            saved = legacy;
+            try { sdkData.setItem(this.key, legacy); } catch (e) {}
+          }
+        }
+      } else {
+        saved = localStorage.getItem(this.key);
+      }
+      const r = JSON.parse(saved);
       if (r && typeof r === 'object') {
         for (const k of ['best','coins','games','stars'])
           if (Number.isFinite(r[k]) && r[k] >= 0) d[k] = Math.floor(r[k]);
@@ -198,6 +213,7 @@ function collect(it) {
   const mult = Math.min(5, 1 + Math.floor(G.combo / 5)), b = ballPos(), d = Save.data;
   if (it.type === 'star') { G.score += 10 * mult; G.runStars++; d.stars++; Sfx.collect(G.combo); emit(b.x, b.y, 18, '#ffe65a', 200, .6, 3); }
   else { G.score += 5 * mult; G.runCoins++; d.coins++; Sfx.coin(); emit(b.x, b.y, 12, '#ffb400', 160, .5, 3); }
+  Save.save();
 }
 
 /* ============ UPDATE ============ */
